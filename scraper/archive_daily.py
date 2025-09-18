@@ -47,7 +47,7 @@ def ist_folder():
     dd         = now.strftime("%d")      # 12
 
     month_folder = f"{month_full} {yy}"      # "December 26"
-    day_folder   = f"{dd}{mon_abbr} {yy}"    # "12Dec 26"
+    day_folder   = f"{dd} {mon_abbr} {yy}"    # "12 Dec 26"
 
     folder = os.path.join(BASE_DIR, year_full, month_folder, day_folder)
     os.makedirs(folder, exist_ok=True)
