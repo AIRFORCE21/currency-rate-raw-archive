@@ -21,7 +21,7 @@ function istFolder() {
   const dd = new Intl.DateTimeFormat("en-CA", { timeZone: tz, day: "2-digit" }).format(now);       // 12
 
   const monthFolder = `${longMonth} ${yy}`;   // "December 26"
-  const dayFolder   = `${dd}${shortMonth} ${yy}`; // "12Dec 26"
+  const dayFolder   = `${dd} ${shortMonth} ${yy}`; // "12 Dec 26"
   const folder = path.join(BASE_DIR, yearFull, monthFolder, dayFolder);
   fs.mkdirSync(folder, { recursive: true });
   return folder;
