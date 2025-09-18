@@ -4,7 +4,7 @@ on:
   schedule:
     # 12:00 PM IST = 06:30 UTC
     - cron: "30 6 * * *"
-  workflow_dispatch: {}   # allows manual runs too
+  workflow_dispatch: {}
 
 permissions:
   contents: write
@@ -16,7 +16,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # 1) Prepare the folder and save HDFC PDF
+      # ---- Python: make folder (IST) + save HDFC PDF ----
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -27,26 +27,47 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run Python (make folders + save HDFC_Rates.pdf)
+      - name: Run archiver (HDFC_Rates.pdf)
         run: python scraper/archive_daily.py
 
-      # 2) Render AXIS & ICICI to PDF via headless Chrome
+      - name: Tree before PDF step
+        run: |
+          echo "== Files BEFORE Node PDF step =="
+          find "data/Currency Raw Data" -maxdepth 5 -type f -print || true
+
+      # ---- Node: render AXIS & ICICI to PDF with Puppeteer ----
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
-      - name: Install puppeteer
+      # Install common Chrome dependencies that Puppeteer needs on ubuntu-latest
+      - name: Install Chromium dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libnss3 libxss1 libasound2 fonts-liberation \
+            libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 \
+            libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 \
+            libglib2.0-0 libgtk-3-0 libpango-1.0-0 libcairo2 \
+            libatspi2.0-0
+
+      - name: Install Puppeteer
         working-directory: scraper
         run: |
           npm init -y
           npm install puppeteer
 
-      - name: Save AXIS/ICICI as PDF
+      - name: Render AXIS & ICICI PDFs
         working-directory: scraper
         run: node save_pdf.js
 
-      # 3) Commit the result
+      - name: Tree after PDF step
+        run: |
+          echo "== Files AFTER Node PDF step =="
+          find "data/Currency Raw Data" -maxdepth 6 -type f -print || true
+
+      # ---- Commit PDFs ----
       - name: Commit daily PDFs
         run: |
           git config user.name "github-actions[bot]"
@@ -54,3 +75,11 @@ jobs:
           git add "data/."
           git commit -m "Daily PDFs: $(date -u +'%Y-%m-%d %H:%M:%S') UTC" || echo "No changes to commit"
           git push
+
+      # Optional: also upload as artifact for easy download/debug
+      - name: Upload day folder artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: day-folder
+          path: |
+            data/Currency Raw Data/**/*
