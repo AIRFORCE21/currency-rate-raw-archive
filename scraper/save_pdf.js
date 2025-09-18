@@ -29,7 +29,7 @@ function istParts() {
   const day = new Intl.DateTimeFormat("en-CA", { timeZone: tz, day: "2-digit" }).format(d);       // 12
 
   const monthFolder = `${longMonth} ${year2}`;   // "December 26"
-  const dayFolder = `${day}${shortMonth} ${year2}`; // "12Dec 26"
+  const dayFolder = `${day} ${shortMonth} ${year2}`; // "12 Dec 26"
   const folder = path.join(BASE_DIR, yearFull, monthFolder, dayFolder);
   fs.mkdirSync(folder, { recursive: true });
   return { folder };
