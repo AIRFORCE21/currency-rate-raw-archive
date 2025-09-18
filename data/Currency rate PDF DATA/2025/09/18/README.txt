@@ -1,7 +1,0 @@
-# Daily currency rate snapshots
-- Run (IST): 2025-09-18T20:11:25+05:30
-
-## Files
-- HDFC_Rates.pdf
-- AXIS_Rates.html
-- ICICI_Rates.html
