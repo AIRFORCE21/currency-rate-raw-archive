@@ -16,7 +16,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # ---- Python: make folder (IST) + save HDFC PDF ----
+      # ---- Python: make folders (IST) + save HDFC PDF ----
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -27,47 +27,36 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run archiver (HDFC_Rates.pdf)
+      - name: Run Python (save HDFC_Rates.pdf and README)
         run: python scraper/archive_daily.py
 
-      - name: Tree before PDF step
+      - name: Tree before Playwright
         run: |
-          echo "== Files BEFORE Node PDF step =="
-          find "data/Currency Raw Data" -maxdepth 5 -type f -print || true
+          echo "== BEFORE =="
+          find "data/Currency Raw Data" -maxdepth 6 -type f -print || true
 
-      # ---- Node: render AXIS & ICICI to PDF with Puppeteer ----
+      # ---- Node: Playwright installs Chromium and all needed libs ----
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
-      # Install common Chrome dependencies that Puppeteer needs on ubuntu-latest
-      - name: Install Chromium dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libnss3 libxss1 libasound2 fonts-liberation \
-            libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 \
-            libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 \
-            libglib2.0-0 libgtk-3-0 libpango-1.0-0 libcairo2 \
-            libatspi2.0-0
-
-      - name: Install Puppeteer
+      - name: Install Playwright and browsers (with deps)
         working-directory: scraper
         run: |
           npm init -y
-          npm install puppeteer
+          npm install playwright
+          npx playwright install --with-deps chromium
 
-      - name: Render AXIS & ICICI PDFs
+      - name: Render AXIS & ICICI PDFs (Playwright)
         working-directory: scraper
         run: node save_pdf.js
 
-      - name: Tree after PDF step
+      - name: Tree after Playwright
         run: |
-          echo "== Files AFTER Node PDF step =="
+          echo "== AFTER =="
           find "data/Currency Raw Data" -maxdepth 6 -type f -print || true
 
-      # ---- Commit PDFs ----
       - name: Commit daily PDFs
         run: |
           git config user.name "github-actions[bot]"
@@ -76,10 +65,8 @@ jobs:
           git commit -m "Daily PDFs: $(date -u +'%Y-%m-%d %H:%M:%S') UTC" || echo "No changes to commit"
           git push
 
-      # Optional: also upload as artifact for easy download/debug
-      - name: Upload day folder artifact
+      - name: Upload day folder (artifact)
         uses: actions/upload-artifact@v4
         with:
           name: day-folder
-          path: |
-            data/Currency Raw Data/**/*
+          path: data/Currency Raw Data/**/*
