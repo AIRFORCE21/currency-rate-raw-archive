@@ -27,6 +27,11 @@ SOURCES = [
         "url": "https://www.icicibank.com/corporate/global-markets/forex/forex-card-rate",
         "ext": "html",  # save raw HTML
     },
+    {
+        "name": "SBI_Rates",
+        "url": "https://officialforexrates.com",
+        "ext": "html",  # save raw HTML
+    },
 ]
 
 DEFAULT_HEADERS = {
