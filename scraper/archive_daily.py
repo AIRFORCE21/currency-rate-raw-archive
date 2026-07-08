@@ -14,7 +14,7 @@ IST = timezone(timedelta(hours=5, minutes=30))
 SOURCES = [
     {
         "name": "HDFC_Rates",
-        "url": "https://www.hdfcbank.com/content/bbp/repositories/723fb80a-2dde-42a3-9793-7ae1be57c87f/?path=/Personal/Home/content/rates.pdf",
+        "url": "https://www.hdfc.bank.in/content/dam/hdfcbankpws/in/en/personal-banking/discover-products/interest-rates/hdfc-bank-treasury-forex-card-rates.pdf",
         "ext": "pdf",  # save as PDF
     },
     {
