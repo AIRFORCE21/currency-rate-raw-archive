@@ -1,5 +1,5 @@
 Daily currency rate snapshots
-Run (IST): 2026-08-29T00:21:57+05:30
+Run (IST): 2026-08-29T18:15:43+05:30
 
 Files:
 - HDFC_Rates.pdf
